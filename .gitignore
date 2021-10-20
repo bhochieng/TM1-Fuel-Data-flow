@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 #Source files
 credentials.json
+/passwords
+passwords/credentials.json
