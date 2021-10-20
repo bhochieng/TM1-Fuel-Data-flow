@@ -35,7 +35,7 @@ def main ():
         else:
             _msoucefolder = 'C:\\Files\\'
         rows=[]
-        _mtype = _msoucefolder+'*1005.txt'
+        _mtype = _msoucefolder+'*109905.txt'
         print(_mtype)
         #check if the file exists in the folder
         for filename in glob.glob(_mtype):
