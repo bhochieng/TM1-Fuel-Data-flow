@@ -3,6 +3,7 @@ import platform
 import os
 import cx_Oracle
 import glob
+import subprocess
 
 with open('passwords/credentials.json') as json_data:
     credentials = json.load(json_data)
@@ -156,6 +157,11 @@ def main ():
         _mcount = _mcount + 1
         print("Yaaay!! ... Done Processing file") 
 if __name__ == "__main__" : main()
-# subprocess.call(['./mv_1005_files.sh'])
+
+if platform.system().upper() == 'LINUX':
+    subprocess.call(['./mv_1005_files.sh']) 
+    print('Done processing')
+else:
+    print('Done processing,')
 
 
