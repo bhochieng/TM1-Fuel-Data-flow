@@ -8,13 +8,14 @@ import subprocess
 with open('passwords/credentials.json') as json_data:
     credentials = json.load(json_data)
 
-#check plafrom
+#Authencticate to Oracle DB
 db_host = credentials['authentication']['dwh_credentials']['host_addr']
 db_username = credentials['authentication']['dwh_credentials']['db_user']
 db_password = credentials['authentication']['dwh_credentials']['db_password']
 db_port = credentials['authentication']['dwh_credentials']['db_port']
 oracle_sid = credentials['authentication']['dwh_credentials']['oracle_sid']
 
+#check plafrom
 if platform.system().upper() == 'LINUX':
     os.environ['LD_LIBRARY_PATH'] = credentials['authentication']['dwh_credentials']['ld_library_path']
     os.environ['ORACLE_HOME'] = credentials['authentication']['dwh_credentials']['oracle_home']
