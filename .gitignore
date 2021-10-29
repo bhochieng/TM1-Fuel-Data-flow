@@ -132,3 +132,4 @@ credentials.json
 /passwords
 passwords/credentials.json
 mongodb_docs/
+plsql_queries/
