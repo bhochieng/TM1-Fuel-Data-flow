@@ -11,6 +11,7 @@ now = datetime.now()
 dt_string = now.strftime("%d%m%Y%H:%M:%S.%f")
 with open('passwords/credentials.json') as json_data:
     credentials = json.load(json_data)
+base_path = credentials['authentication']['dwh_credentials']['project_base_path']
 
 #Authencticate to Oracle DB
 db_host = credentials['authentication']['dwh_credentials']['host_addr']
@@ -72,4 +73,7 @@ dbCon.commit()
 cursor.close()
 dbCon.close()
 
+#subprocess.call(['./mv_oases_prod.sh']) 
+#./mv_oases.sh
+execfile(base_path+"TM1_Fuelplus_Projects/scripts/populate_gmt_var.py")
 
