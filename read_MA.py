@@ -28,6 +28,11 @@ else:
     dsn_tns = cx_Oracle.makedsn(db_host, db_port, oracle_sid)
     dbCon = cx_Oracle.connect(db_username, db_password, dsn_tns)
 cursor = cx_Oracle.Cursor(dbCon) 
+cursor1 = cx_Oracle.Cursor(dbCon)
+cursor2 = cx_Oracle.Cursor(dbCon)
+cursor3 = cx_Oracle.Cursor(dbCon)
+cursor4 = cx_Oracle.Cursor(dbCon)
+cursor_select   = cx_Oracle.Cursor(dbCon)
 
 def main():
     _mcount = 0
@@ -104,13 +109,41 @@ def main():
                     _mbags      =     mlines[47]
                     _mcrew  =     mlines[48]
                     _mfiledatetime = mfilename_db.strip()
-                    _mrow= [_mdate,_mflt,_mcarrier,_mtype,_mreg,_mdep,_marr,_mstd,_msta,_metd,_meta,_mtkof,_mtdwn,_matd,_mata,_mblock,_mflthr,_mst,_mstd_local,_msta_local,_metd_local,_meta_local,_mtkof_local,_mtdwn_local,_matd_local,_mata_local,_macversion,_macconfig,_macconfig1,_mactpax,_mactpax1,_mpax,_mactblockoff,_macttkoff,_macttdown,_mactblockon,_morgdate,_morgstd,_morgsta,_mdly1,_mdly1arr,_minitia,_muplift,_mtotal,_mremain,_maburn,_msg,_mcargo,_mmail,_mbags,_mcrew,_mfiledatetime ]
+
+                    ####Add gmt var and time zones based on airport IATA CODES.
+                    #get  timezone for dep
+                    _utc_timezone = """ select TIMEZONE from AIRPORT_TZ_OFFSET where AIRPORT_CODE = :airport_code """
+                    cursor1.execute(_utc_timezone,airport_code=_mdep)
+                    #get  timezone for arr
+                    _utc_timezone = """ select TIMEZONE from AIRPORT_TZ_OFFSET where AIRPORT_CODE = :airport_code """
+                    cursor2.execute(_utc_timezone,airport_code=_marr)
+                    for row in cursor1:
+                        _flt_dep_gmt_time_zone = str(row[0]).strip()
+                        # print(_flt_dep_gmt_time_zone)
+                    for row in cursor2:
+                        _flt_arr_gmt_time_zone = str(row[0]).strip()
+                        # print(_flt_arr_gmt_time_zone)
+                    #Get DEP GMT OFFSET BASED ON TIMEZONE above.
+                    tz_dep_offset_querry = """ SELECT TZ_OFFSET( :time_zone ) FROM DUAL """
+                    cursor3.execute(tz_dep_offset_querry, time_zone=_flt_dep_gmt_time_zone)
+                    for row in cursor3:
+                        _flt_dep_gmt_var = str(row[0]).replace(':','').strip()
+                        # print(_flt_dep_gmt_var)
+                    #Get ARR GMT OFFSET BASED ON TIMEZONE above.
+                    tz_arr_offset_querry = """ SELECT TZ_OFFSET( :time_zone ) FROM DUAL """
+                    cursor4.execute(tz_arr_offset_querry, time_zone=_flt_arr_gmt_time_zone)
+                    for row in cursor4:
+                        _flt_arr_gmt_var = str(row[0]).replace(':','').strip()
+                        # print(_flt_dep_gmt_var)
+                    print("DEP",_flt_dep_gmt_time_zone ,_flt_dep_gmt_var, "|     ARR", _flt_arr_gmt_time_zone,_flt_arr_gmt_var )
+
+                    _mrow= [_mdate,_mflt,_mcarrier,_mtype,_mreg,_mdep,_marr,_mstd,_msta,_metd,_meta,_mtkof,_mtdwn,_matd,_mata,_mblock,_mflthr,_mst,_mstd_local,_msta_local,_metd_local,_meta_local,_mtkof_local,_mtdwn_local,_matd_local,_mata_local,_macversion,_macconfig,_macconfig1,_mactpax,_mactpax1,_mpax,_mactblockoff,_macttkoff,_macttdown,_mactblockon,_morgdate,_morgstd,_morgsta,_mdly1,_mdly1arr,_minitia,_muplift,_mtotal,_mremain,_maburn,_msg,_mcargo,_mmail,_mbags,_mcrew ,_McreateDate,_mfiledatetime,_flt_dep_gmt_var,_flt_arr_gmt_var,_flt_dep_gmt_time_zone,_flt_arr_gmt_time_zone ]
                     rows.append(_mrow)
                     print(_mrow)
                     _monce ==1
                     _n = _n + 1
             if _n>0 :
-                cursor.prepare('insert into dwh_foundation.T_TM1_NEW1_1_LOAD(date_,flt,carrier,type,reg,dep,arr,std,sta,etd,eta,tkof,tdwn,atd,ata,block,flthr,st,std_local,sta_local,etd_local,eta_local,tkof_local,tdwn_local,atd_local,ata_local,acversion,BUSINESS_CLASS,ECONOMY,ACTPAX_BUSINESS,ACTPAX_ECONOMY,pax,actblockoff,acttkoff,acttdown,actblockon,orgdate,orgstd,orgsta,dly1,dly1arr,initia,uplift,total,remain,aburn,sg,cargo,mail,bags,crew,EMAIL_FILE_DATE) values (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13, :14,:15,:16,:17,:18,:19,:20,:21,:22, :23, :24, :25, :26, :27, :28, :29, :30, :31, :32, :33, :34, :35, :36, :37, :38, :39, :40,:41,:42,:43,:44,:45,:46,:47,:48,:49,:50,:51,:52)')
+                cursor.prepare('insert into system.T_TM1_LOAD(date_,flt,carrier,type,reg,dep,arr,std,sta,etd,eta,tkof,tdwn,atd,ata,block,flthr,st,std_local,sta_local,etd_local,eta_local,tkof_local,tdwn_local,atd_local,ata_local,acversion,BUSINESS_CLASS,ECONOMY,ACTPAX_BUSINESS,ACTPAX_ECONOMY,pax,actblockoff,acttkoff,acttdown,actblockon,orgdate,orgstd,orgsta,dly1,dly1arr,initia,uplift,total,remain,aburn,sg,cargo,mail,bags,crew,createdate,EMAIL_FILE_DATE,DEP_GMT_VAR,ARR_GMT_VAR,DEP_TIMEZONE,ARR_TIMEZONE) values (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13, :14,:15,:16,:17,:18,:19,:20,:21,:22, :23, :24, :25, :26, :27, :28, :29, :30, :31, :32, :33, :34, :35, :36, :37, :38, :39, :40,:41,:42,:43,:44,:45,:46,:47,:48,:49,:50,:51,:52,:53,:54,:55,:56,:57)')
                 cursor.executemany(None, rows)
                 rows=[]
                 _n = 0
