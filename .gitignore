@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+#Source files
+credentials.json
+/passwords
+passwords/credentials.json
+mongodb_docs/
+plsql_queries/
