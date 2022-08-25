@@ -68,8 +68,9 @@ try:
                 if bool(fileName):
                     #check the file name and decide the folder to dump the file.
                     #dynamically create a directory using python.
-                    folder_name = fileName.replace('.txt','')
-                    parent_path= "./attach/"
+                    folder_name = fileName.replace('.txt','')+'_files'
+                    # folder_name = folder_n+'_files'
+                    parent_path= "./attachments/"
                     combo_path = os.path.join(parent_path, folder_name)
                     if not os.path.isdir(combo_path):
                         os.mkdir(combo_path)
@@ -88,7 +89,4 @@ try:
     raise Exception(senders_emails,'def')
 except Exception as e:
     print ('Not able to download all attachments.', str(e))
-
-## Check the other mail box
-time.sleep(5)
 
